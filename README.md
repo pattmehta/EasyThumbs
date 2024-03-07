@@ -66,7 +66,7 @@ Cached filenames are unique string filenames generated from thumbnail urls using
 
 <img src="./readme_img/example.gif" width="300" alt="example" />
 
-#### Detais
+#### Details
 
 The example app uses a `NavigationStack` to embed two views - rootView, otherView. For the
 purpose of explanation, let us call them screens. The first screen contains a `VStack` with
@@ -91,4 +91,4 @@ related to the following
 
 then create the required folder using the `mkdir -p` command. Please note that this step is not required
 at all (i.e. there are no issues) if `EasyThumbs` view is used in an actual app, and executed on the simulator
-or a real device. So, if the above issue persists in the preview mode, switch to the latter.
+or a real device. So, if the above issue persists in the preview mode, please switch to the latter.
