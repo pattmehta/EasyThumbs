@@ -1,7 +1,7 @@
 ### Contents
 
 Package provides four main things
-1. `EasyThumbs` view, which displays a list of row views with `ThumbData` (thumbnail image + detail text)
+1. `EasyThumbs` view, which displays a list of row views with thumbnail image + detail text
 2. Customizable row detail view which receives `ThumbData`
 3. Background `task` to download image urls in a collection of `ThumbData`
 4. Built-in caching of the downloaded images
@@ -24,12 +24,16 @@ the row detail view. The complete list of initialization parameters are
 
 - urls: `[String]`
 - details: `[[String]]` = []
-- parentWidth: `CGFloat` = 350
-- parentHeight: `CGFloat` = 550
-- rowHeight: `CGFloat` = 45,
+- parentSize: `CGSize` = CGSize(width: 350, height: 505)
+- contentRowSize: `CGSize` = CGSize(width: 250, height: 44)
+- imageSize: `CGSize` = CGSize(width: 44, height: 31)
+- imageScaleFactor: `CGFloat` = 1
+- imageClipShapeRadius: `CGFloat` = 1
+- contentSpacing: `CGFloat` = 1
+- rowColor: `Color` = Color.white
 - content: `@escaping (ThumbData) -> any View)`
 
-> Debugging can be turned on by setting `EasyThumbs.debug`. Its default value is `true`, and running
+> Debugging can be turned on by setting `EasyThumbs.debug`. Its default value is `false`, and running
 > the example app will print the following logs, after successful caching of urls defined in `ytUrls`.
 
 	listCache:
@@ -65,6 +69,12 @@ Cached filenames are unique string filenames generated from thumbnail urls using
 ### Example
 
 <img src="./readme_img/example.gif" width="300" alt="example" />
+
+#### Default and Customized Styling
+<p style="float=left">
+    <img src="./readme_img/example_default.png" height="500" />
+    <img src="./readme_img/example_customized.png" height="500" />
+</p>
 
 #### Details
 
