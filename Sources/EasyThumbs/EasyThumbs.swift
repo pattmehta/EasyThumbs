@@ -3,7 +3,7 @@ import SwiftUI
 public struct ThumbData: Identifiable {
     public let id: Int
     let url: URL
-    let detail: [String]?
+    public let detail: [String]?
     
     init(id: Int, url: URL, detail: [String]? = nil) {
         self.id = id
@@ -14,26 +14,40 @@ public struct ThumbData: Identifiable {
 
 public struct EasyThumbs: View  {
     
-    public static var debug: Bool = true
+    public static var debug: Bool = false
     
     @State private var cachedThumbs: [ThumbData] = []
     @State private var offlineRetries = 1
     
-    private let parentWidth: CGFloat
-    private let parentHeight: CGFloat
-    private let rowHeight: CGFloat
     private let urls: [String]
     private let details: [[String]]
+    private let parentWidth: CGFloat
+    private let parentHeight: CGFloat
+    private let contentRowWidth: CGFloat
+    private let contentRowHeight: CGFloat
+    private let imageSize: CGSize
+    private let imageScaleFactor: CGFloat
+    private let imageClipShapeRadius: CGFloat
+    private let contentSpacing: CGFloat
+    private let rowColor: Color
     
     @ViewBuilder private let content: (ThumbData) -> any View
     
-    init(urls: [String], details: [[String]] = [], parentWidth: CGFloat = 350, parentHeight: CGFloat = 550,
-         rowHeight: CGFloat = 45, content: @escaping (ThumbData) -> any View) {
+    public init(urls: [String], details: [[String]] = [], parentSize: CGSize = CGSize(width: 350, height: 505),
+                contentRowSize: CGSize = CGSize(width: 250, height: 44), imageSize: CGSize = CGSize(width: 44, height: 31),
+                imageScaleFactor: CGFloat = 1, imageClipShapeRadius: CGFloat = 1, contentSpacing: CGFloat = 1, rowColor: Color = Color.white,
+                content: @escaping (ThumbData) -> any View) {
         self.urls = urls
         self.details = details
-        self.parentWidth = parentWidth
-        self.parentHeight = parentHeight
-        self.rowHeight = rowHeight
+        self.parentWidth = parentSize.width
+        self.parentHeight = parentSize.height
+        self.contentRowWidth = contentRowSize.width
+        self.contentRowHeight = contentRowSize.height
+        self.imageSize = imageSize
+        self.imageScaleFactor = imageScaleFactor
+        self.imageClipShapeRadius = imageClipShapeRadius
+        self.contentSpacing = contentSpacing
+        self.rowColor = rowColor
         self.content = content
     }
     
@@ -44,7 +58,7 @@ public struct EasyThumbs: View  {
                     AnyView(content(thumbData))
                 }
             }
-            .frame(width: parentWidth * autoMainWidthFactor(cachedThumbs), height: parentHeight, alignment: .center)
+            .frame(width: parentWidth * autoMainWidthFactor(), height: parentHeight, alignment: .center)
             .onAppear {
                 offlineRetries = 1
                 cachedThumbs = []
@@ -70,20 +84,30 @@ public struct EasyThumbs: View  {
     
     @ViewBuilder
     private func asyncViewRows(@ViewBuilder content: @escaping (ThumbData) -> some View) -> some View {
-        ForEach(cachedThumbs, id:\.id) { thumbData in
+        List(cachedThumbs, id:\.id) { thumbData in
             let data = Data(url: thumbData.url) // withBackup
-            HStack(alignment: .center) {
-                Image(uiImage: UIImage(data: data)!)
-                    .resizable(resizingMode: .stretch)
-                    .frame(width: EasyThumbsConstants.thumbWidth, height: EasyThumbsConstants.thumbHeight)
-                    .aspectRatio(contentMode: .fill)
+            HStack(alignment: .center, spacing: contentSpacing) {
+                ZStack(alignment: .topLeading) {
+                    Image(uiImage: UIImage(data: data)!)
+                        .resizable()
+                        .scaledToFill()
+                        .frame(width: imageSize.width * imageScaleFactor, height: imageSize.height * imageScaleFactor, alignment: .center)
+                }
+                .frame(width: imageSize.width, height: imageSize.height)
+                .clipShape(RoundedRectangle(cornerRadius: imageClipShapeRadius))
                 if thumbData.detail != nil {
                     // custom view content
                     content(thumbData)
+                        .frame(width: contentRowWidth, height: contentRowHeight)
                 }
             }
-            .frame(width: parentWidth * autoRowWidthFactor(thumbData), height: rowHeight, alignment: autoalignment(thumbData))
+            .listRowSeparator(.hidden)
+            .listRowBackground(rowColor)
         }
+        .frame(width: parentWidth * autoRowWidthFactor(), height: parentHeight * 0.95, alignment: .center)
+        .scrollContentBackground(.hidden)
+        .listStyle(.plain)
+        .debugBorder()
     }
     
     private func loadCachedUrls() async throws {
@@ -135,26 +159,25 @@ fileprivate extension EasyThumbs {
         return false
     }
     
-    private func autoalignment(_ thumbdata: ThumbData) -> Alignment {
+    private func autoalignment() -> Alignment {
         /// helps aligning images to the center, if details are not passed
-        guard thumbdata.detail != nil else {
+        guard details.count > 0 else {
             return .center
         }
         return .leading
     }
     
-    private func autoRowWidthFactor(_ thumbdata: ThumbData) -> CGFloat {
+    private func autoRowWidthFactor() -> CGFloat {
         /// adjusts width factor for the row frame
-        guard thumbdata.detail != nil else {
+        guard details.count > 0 else {
             return EasyThumbsConstants.narrowRowFactor
         }
         return EasyThumbsConstants.wideRowFactor
     }
     
-    private func autoMainWidthFactor(_ cachedThumbs: [ThumbData]) -> CGFloat {
+    private func autoMainWidthFactor() -> CGFloat {
         /// adjusts width factor for the main view
-        let details = cachedThumbs.map { $0.detail }
-        guard details.first(where: { $0 == nil }) == nil else {
+        guard details.count > 0 else {
             return EasyThumbsConstants.mainWidthNarrowFactor
         }
         return EasyThumbsConstants.mainWidthWideFactor
@@ -175,3 +198,13 @@ let placeholderBitmap: Data = {
         context.cgContext.drawPath(using: .fill)
     }
 }()
+
+fileprivate extension View {
+    
+    @ViewBuilder func debugBorder() -> some View {
+        if EasyThumbs.debug {
+            return AnyView(self.overlay(Rectangle().stroke(Color.yellow, lineWidth: 1)))
+        }
+        return AnyView(self)
+    }
+}
