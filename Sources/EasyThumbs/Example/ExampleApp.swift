@@ -4,7 +4,9 @@ public struct EasyThumbsExampleApp: View {
     
     @State private var navigationPath = NavigationPath()
     
-    public init() {}
+    public init(debug: Bool = false) {
+        EasyThumbs.debug = debug
+    }
     
     public var body: some View {
         NavigationStack(path: $navigationPath) {
