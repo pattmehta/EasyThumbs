@@ -31,7 +31,24 @@ the row detail view. The complete list of initialization parameters are
 - imageClipShapeRadius: `CGFloat` = 1
 - contentSpacing: `CGFloat` = 1
 - rowColor: `Color` = Color.white
+- scrollIndicatorVisibility: `ScrollIndicatorVisibility` = .hidden
 - content: `@escaping (ThumbData) -> any View)`
+
+#### Description
+
+- **urls**: An array of strings representing URLs.
+- **details**: A 2D array of strings containing additional details.
+- **parentSize**: The size of the parent container.
+- **contentRowSize**: The size of each content row.
+- **imageSize**: The size of image view.
+- **imageScaleFactor**: A scaling factor for images.
+- **imageClipShapeRadius**: The radius of rectangular corners for the clip shape.
+- **contentSpacing**: Spacing between thumbnail and detail.
+- **rowColor**: The background color for the entire list row.
+- **scrollIndicatorVisibility**: Visibility of vertical scroll indicator.
+- **content**: A closure that generates a view based on `ThumbData`.
+
+#### Debugging
 
 > Debugging can be turned on by setting `EasyThumbs.debug`. Its default value is `false`, and running
 > the example app will print the following logs, after successful caching of urls defined in `ytUrls`.

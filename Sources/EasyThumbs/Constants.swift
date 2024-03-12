@@ -3,7 +3,7 @@ import Foundation
 struct EasyThumbsConstants {
     
     static let maxOfflineRetries: Int = 3
-    static let sleepTimeInMilliseconds: Int = 100
+    static let sleepTimeInMilliseconds: Int = 5
     static let overCacheTolerance: Float = 0.2
     static let base64StringSkipTrailingCount: Int = 15
     static let wideRowFactor: CGFloat = 0.9

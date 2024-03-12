@@ -30,13 +30,14 @@ public struct EasyThumbs: View  {
     private let imageClipShapeRadius: CGFloat
     private let contentSpacing: CGFloat
     private let rowColor: Color
+    private let scrollIndicatorVisibility: ScrollIndicatorVisibility
     
     @ViewBuilder private let content: (ThumbData) -> any View
     
     public init(urls: [String], details: [[String]] = [], parentSize: CGSize = CGSize(width: 350, height: 505),
                 contentRowSize: CGSize = CGSize(width: 250, height: 44), imageSize: CGSize = CGSize(width: 44, height: 31),
                 imageScaleFactor: CGFloat = 1, imageClipShapeRadius: CGFloat = 1, contentSpacing: CGFloat = 1, rowColor: Color = Color.white,
-                content: @escaping (ThumbData) -> any View) {
+                scrollIndicatorVisibility: ScrollIndicatorVisibility = .hidden, content: @escaping (ThumbData) -> any View) {
         self.urls = urls
         self.details = details
         self.parentWidth = parentSize.width
@@ -48,6 +49,7 @@ public struct EasyThumbs: View  {
         self.imageClipShapeRadius = imageClipShapeRadius
         self.contentSpacing = contentSpacing
         self.rowColor = rowColor
+        self.scrollIndicatorVisibility = scrollIndicatorVisibility
         self.content = content
     }
     
@@ -107,6 +109,7 @@ public struct EasyThumbs: View  {
         .frame(width: parentWidth * autoRowWidthFactor(), height: parentHeight * 0.95, alignment: .center)
         .scrollContentBackground(.hidden)
         .listStyle(.plain)
+        .scrollIndicators(scrollIndicatorVisibility, axes: .vertical)
         .debugBorder()
     }
     
