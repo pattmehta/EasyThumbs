@@ -1,17 +1,22 @@
 ### Contents
 
-Package provides four main things
+Package provides five main things
 1. `EasyThumbs` view, which displays a list of row views with thumbnail image + detail text
 2. Customizable row detail view which receives `ThumbData`
 3. Background `task` to download image urls in a collection of `ThumbData`
 4. Built-in caching of the downloaded images
+5. Above list can be made selectable for single/multiple selections
 
 ### Usage
 
 As seen in the `EasyThumbsExampleApp`, the `EasyThumbs` view needs be initialized
-with a collection of url strings, followed by a collection of detail strings.
+with a collection of url strings, followed by a collection of detail strings, and
+a `selectionMode` with `selections` state (to make the list selectable)
 
-    EasyThumbs(urls: EasyThumbsExampleAppConstants.ytUrls, details: EasyThumbsExampleAppConstants.loremSentences) { thumbData in
+    EasyThumbs(
+        urls: EasyThumbsExampleAppConstants.ytUrls,
+        details: EasyThumbsExampleAppConstants.loremSentences,
+        selectionMode: .single, selections: $selections) { thumbData in
         Text(thumbData.detail!.joined(separator: ","))
             .font(.system(size: 11))
             .lineLimit(2).truncationMode(.tail).multilineTextAlignment(.leading)
@@ -32,6 +37,9 @@ the row detail view. The complete list of initialization parameters are
 - contentSpacing: `CGFloat` = 1
 - rowColor: `Color` = Color.white
 - scrollIndicatorVisibility: `ScrollIndicatorVisibility` = .hidden
+- selectionColor: `Color` = Color.green
+- selectionMode: `SelectionMode` = .none
+- selections: `Binding<[Int]>`
 - content: `@escaping (ThumbData) -> any View)`
 
 #### Description
@@ -46,6 +54,9 @@ the row detail view. The complete list of initialization parameters are
 - **contentSpacing**: Spacing between thumbnail and detail.
 - **rowColor**: The background color for the entire list row.
 - **scrollIndicatorVisibility**: Visibility of vertical scroll indicator.
+- **selectionColor**: The color of the selection border.
+- **selectionMode**: Selection mode of the list (none, single, multiple).
+- **selections**: The binding to the `@State` collection of selected index/indices.
 - **content**: A closure that generates a view based on `ThumbData`.
 
 #### Debugging

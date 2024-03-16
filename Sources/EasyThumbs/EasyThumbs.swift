@@ -1,6 +1,7 @@
 import SwiftUI
 
 public struct ThumbData: Identifiable {
+    
     public let id: Int
     let url: URL
     public let detail: [String]?
@@ -12,12 +13,19 @@ public struct ThumbData: Identifiable {
     }
 }
 
+public enum SelectionMode {
+    case none
+    case single
+    case multiple
+}
+
 public struct EasyThumbs: View  {
     
     public static var debug: Bool = false
     
     @State private var cachedThumbs: [ThumbData] = []
     @State private var offlineRetries = 1
+    @Binding private var selections: [Int]
     
     private let urls: [String]
     private let details: [[String]]
@@ -31,13 +39,17 @@ public struct EasyThumbs: View  {
     private let contentSpacing: CGFloat
     private let rowColor: Color
     private let scrollIndicatorVisibility: ScrollIndicatorVisibility
+    private let selectionColor: Color
+    private let selectionMode: SelectionMode
     
     @ViewBuilder private let content: (ThumbData) -> any View
     
     public init(urls: [String], details: [[String]] = [], parentSize: CGSize = CGSize(width: 350, height: 505),
                 contentRowSize: CGSize = CGSize(width: 250, height: 44), imageSize: CGSize = CGSize(width: 44, height: 31),
                 imageScaleFactor: CGFloat = 1, imageClipShapeRadius: CGFloat = 1, contentSpacing: CGFloat = 1, rowColor: Color = Color.white,
-                scrollIndicatorVisibility: ScrollIndicatorVisibility = .hidden, content: @escaping (ThumbData) -> any View) {
+                scrollIndicatorVisibility: ScrollIndicatorVisibility = .hidden,
+                selectionColor: Color = Color.green, selectionMode: SelectionMode = .none, selections: Binding<[Int]>,
+                content: @escaping (ThumbData) -> any View) {
         self.urls = urls
         self.details = details
         self.parentWidth = parentSize.width
@@ -50,6 +62,9 @@ public struct EasyThumbs: View  {
         self.contentSpacing = contentSpacing
         self.rowColor = rowColor
         self.scrollIndicatorVisibility = scrollIndicatorVisibility
+        self.selectionColor = selectionColor
+        self.selectionMode = selectionMode
+        self._selections = selections
         self.content = content
     }
     
@@ -105,12 +120,33 @@ public struct EasyThumbs: View  {
             }
             .listRowSeparator(.hidden)
             .listRowBackground(rowColor)
+            .overlay(highlight(selection: thumbData.id))
+            .onTapGesture {
+                guard selectionMode != .none else {
+                    return
+                }
+                if selectionMode == .single {
+                    selections = [thumbData.id]
+                } else {
+                    selections.append(thumbData.id)
+                }
+            }
         }
         .frame(width: parentWidth * autoRowWidthFactor(), height: parentHeight * 0.95, alignment: .center)
         .scrollContentBackground(.hidden)
         .listStyle(.plain)
         .scrollIndicators(scrollIndicatorVisibility, axes: .vertical)
         .debugBorder()
+    }
+    
+    @ViewBuilder
+    private func highlight(selection index: Int) -> some View {
+        if selectionMode != .none, selections.contains(where: { $0 == index }) {
+            RoundedRectangle(cornerRadius: 5)
+                .stroke(selectionColor, style: StrokeStyle(lineWidth: 2, dash: [3]))
+        } else {
+            EmptyView()
+        }
     }
     
     private func loadCachedUrls() async throws {
