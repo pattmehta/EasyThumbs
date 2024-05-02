@@ -6,6 +6,7 @@ Package provides five main things
 3. Background `task` to download image urls in a collection of `ThumbData`
 4. Built-in caching of the downloaded images
 5. Above list can be made selectable for single/multiple selections
+6. List can be refreshed using `onRefresh` callback
 
 ### Usage
 
@@ -25,7 +26,7 @@ a `selectionMode` with `selections` state (to make the list selectable)
     }
 
 The `closure` at the end receives a value of type `ThumbData`. This value can be used to customize
-the row detail view. The complete list of initialization parameters are
+the row detail view. The complete list of initialization parameters are described as following.
 
 - urls: `[String]`
 - details: `[[String]]` = []
@@ -40,6 +41,7 @@ the row detail view. The complete list of initialization parameters are
 - selectionColor: `Color` = Color.green
 - selectionMode: `SelectionMode` = .none
 - selections: `Binding<[Int]>`
+- onRefresh: `callback?`
 - content: `@escaping (ThumbData) -> any View)`
 
 #### Description
@@ -57,6 +59,7 @@ the row detail view. The complete list of initialization parameters are
 - **selectionColor**: The color of the selection border.
 - **selectionMode**: Selection mode of the list (none, single, multiple).
 - **selections**: The binding to the `@State` collection of selected index/indices.
+- **onRefresh**: A callback that gets invoked when the list is refreshed.
 - **content**: A closure that generates a view based on `ThumbData`.
 
 #### Debugging

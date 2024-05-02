@@ -21,8 +21,9 @@ public enum SelectionMode {
 
 public struct EasyThumbs: View  {
     
-    public static var debug: Bool = false
+    public typealias callback = () -> ()
     
+    public static var debug: Bool = false
     @State private var cachedThumbs: [ThumbData] = []
     @State private var offlineRetries = 1
     @Binding private var selections: [Int]
@@ -41,6 +42,7 @@ public struct EasyThumbs: View  {
     private let scrollIndicatorVisibility: ScrollIndicatorVisibility
     private let selectionColor: Color
     private let selectionMode: SelectionMode
+    private let onRefresh: callback?
     
     @ViewBuilder private let content: (ThumbData) -> any View
     
@@ -49,7 +51,7 @@ public struct EasyThumbs: View  {
                 imageScaleFactor: CGFloat = 1, imageClipShapeRadius: CGFloat = 1, contentSpacing: CGFloat = 1, rowColor: Color = Color.white,
                 scrollIndicatorVisibility: ScrollIndicatorVisibility = .hidden,
                 selectionColor: Color = Color.green, selectionMode: SelectionMode = .none, selections: Binding<[Int]>,
-                content: @escaping (ThumbData) -> any View) {
+                onRefresh: callback? = nil, content: @escaping (ThumbData) -> any View) {
         self.urls = urls
         self.details = details
         self.parentWidth = parentSize.width
@@ -65,6 +67,8 @@ public struct EasyThumbs: View  {
         self.selectionColor = selectionColor
         self.selectionMode = selectionMode
         self._selections = selections
+        /// Stored closures outlive the function scope, so they are marked `@escaping`
+        self.onRefresh = onRefresh
         self.content = content
     }
     
@@ -136,6 +140,11 @@ public struct EasyThumbs: View  {
         .scrollContentBackground(.hidden)
         .listStyle(.plain)
         .scrollIndicators(scrollIndicatorVisibility, axes: .vertical)
+        .refreshable {
+            if let onRefresh = onRefresh {
+                onRefresh()
+            }
+        }
         .debugBorder()
     }
     
