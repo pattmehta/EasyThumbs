@@ -4,10 +4,12 @@ public struct EasyThumbsExampleApp: View {
     
     @State private var navigationPath = NavigationPath()
     @State private var selections: [Int]
+    @State private var searchQuery: String
     
     public init(debug: Bool = false) {
         EasyThumbs.debug = debug
         _selections = State(initialValue: [])
+        _searchQuery = State(initialValue: "")
     }
     
     public var body: some View {
@@ -26,7 +28,7 @@ public struct EasyThumbsExampleApp: View {
     func rootView() -> some View {
         VStack(alignment: .center) {
             EasyThumbs(urls: EasyThumbsExampleAppConstants.ytUrls, details: EasyThumbsExampleAppConstants.loremSentences,
-                       selectionMode: .single, selections: $selections) { thumbData in
+                       selectionMode: .single, selections: $selections, filterQuery: $searchQuery) { thumbData in
                 Text(thumbData.detail!.joined(separator: ","))
                     .font(.system(size: 11))
                     .lineLimit(2).truncationMode(.tail).multilineTextAlignment(.leading)

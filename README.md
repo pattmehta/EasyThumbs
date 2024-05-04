@@ -1,12 +1,12 @@
 ### Contents
 
-Package provides five main things
+Package provides six main things
 1. `EasyThumbs` view, which displays a list of row views with thumbnail image + detail text
 2. Customizable row detail view which receives `ThumbData`
 3. Background `task` to download image urls in a collection of `ThumbData`
 4. Built-in caching of the downloaded images
 5. Above list can be made selectable for single/multiple selections
-6. List can be refreshed using `onRefresh` callback
+6. List can be refreshed using `onRefresh` callback, and it can be filtered using `filterQuery` binding
 
 ### Usage
 
@@ -17,7 +17,7 @@ a `selectionMode` with `selections` state (to make the list selectable)
     EasyThumbs(
         urls: EasyThumbsExampleAppConstants.ytUrls,
         details: EasyThumbsExampleAppConstants.loremSentences,
-        selectionMode: .single, selections: $selections) { thumbData in
+        selectionMode: .single, selections: $selections, filterQuery: $searchQuery) { thumbData in
         Text(thumbData.detail!.joined(separator: ","))
             .font(.system(size: 11))
             .lineLimit(2).truncationMode(.tail).multilineTextAlignment(.leading)
@@ -41,6 +41,7 @@ the row detail view. The complete list of initialization parameters are describe
 - selectionColor: `Color` = Color.green
 - selectionMode: `SelectionMode` = .none
 - selections: `Binding<[Int]>`
+- filterQuery: `Binding<String>`
 - onRefresh: `callback?`
 - content: `@escaping (ThumbData) -> any View)`
 
@@ -59,6 +60,7 @@ the row detail view. The complete list of initialization parameters are describe
 - **selectionColor**: The color of the selection border.
 - **selectionMode**: Selection mode of the list (none, single, multiple).
 - **selections**: The binding to the `@State` collection of selected index/indices.
+- **filterQuery**: The binding to the `@State` string for filtering `cachedThumbs`.
 - **onRefresh**: A callback that gets invoked when the list is refreshed.
 - **content**: A closure that generates a view based on `ThumbData`.
 

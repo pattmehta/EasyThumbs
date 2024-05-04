@@ -27,6 +27,7 @@ public struct EasyThumbs: View  {
     @State private var cachedThumbs: [ThumbData] = []
     @State private var offlineRetries = 1
     @Binding private var selections: [Int]
+    @Binding private var filterQuery: String
     
     private let urls: [String]
     private let details: [[String]]
@@ -51,6 +52,7 @@ public struct EasyThumbs: View  {
                 imageScaleFactor: CGFloat = 1, imageClipShapeRadius: CGFloat = 1, contentSpacing: CGFloat = 1, rowColor: Color = Color.white,
                 scrollIndicatorVisibility: ScrollIndicatorVisibility = .hidden,
                 selectionColor: Color = Color.green, selectionMode: SelectionMode = .none, selections: Binding<[Int]>,
+                filterQuery: Binding<String>,
                 onRefresh: callback? = nil, content: @escaping (ThumbData) -> any View) {
         self.urls = urls
         self.details = details
@@ -67,6 +69,7 @@ public struct EasyThumbs: View  {
         self.selectionColor = selectionColor
         self.selectionMode = selectionMode
         self._selections = selections
+        self._filterQuery = filterQuery
         /// Stored closures outlive the function scope, so they are marked `@escaping`
         self.onRefresh = onRefresh
         self.content = content
@@ -105,7 +108,7 @@ public struct EasyThumbs: View  {
     
     @ViewBuilder
     private func asyncViewRows(@ViewBuilder content: @escaping (ThumbData) -> some View) -> some View {
-        List(cachedThumbs, id:\.id) { thumbData in
+        List(cachedThumbsFiltered(), id:\.id) { thumbData in
             let data = Data(url: thumbData.url) // withBackup
             HStack(alignment: .center, spacing: contentSpacing) {
                 ZStack(alignment: .topLeading) {
@@ -155,6 +158,16 @@ public struct EasyThumbs: View  {
                 .stroke(selectionColor, style: StrokeStyle(lineWidth: 2, dash: [3]))
         } else {
             EmptyView()
+        }
+    }
+    
+    private func cachedThumbsFiltered() -> [ThumbData] {
+        guard filterQuery.count > 2 else {
+            return cachedThumbs
+        }
+        return cachedThumbs.filter {
+            $0.detail?.joined(separator:"").lowercased().contains(filterQuery.lowercased())
+            ?? false
         }
     }
     
