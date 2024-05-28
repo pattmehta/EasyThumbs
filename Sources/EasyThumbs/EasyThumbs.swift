@@ -23,7 +23,11 @@ public struct EasyThumbs: View  {
     
     public typealias callback = () -> ()
     
-    public static var debug: Bool = false
+    public static var debug: Bool = false {
+        didSet {
+            CacheUtils.debug = debug
+        }
+    }
     @State private var cachedThumbs: [ThumbData] = []
     @State private var offlineRetries = 1
     @Binding private var selections: [Int]

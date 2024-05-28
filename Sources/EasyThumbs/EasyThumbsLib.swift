@@ -3,6 +3,7 @@ import SwiftUI
 class CacheUtils {
     
     static let shared: CacheUtils = CacheUtils()
+    static var debug: Bool = true
     
     private init() {}
     
@@ -41,10 +42,14 @@ class CacheUtils {
         
         let imgDiskUrl = URL(fileURLWithPath: cacheDir).appendingPathComponent(imgFilename)
         if FileManager.default.fileExists(atPath: imgDiskUrl.path(percentEncoded: true)) {
-            print("read-cache: \(imgFilename)")
+            if CacheUtils.debug {
+                print("read-cache: \(imgFilename)")
+            }
             return imgDiskUrl
         } else {
-            print("read-cache-failed: \(imgFilename)")
+            if CacheUtils.debug {
+                print("read-cache-failed: \(imgFilename)")
+            }
             return nil
         }
     }
@@ -56,10 +61,14 @@ class CacheUtils {
         let imgDiskUrl = URL(fileURLWithPath: cacheDir).appendingPathComponent(imgFilename)
         do {
             try imgData.write(to: imgDiskUrl)
-            print("write-cache: \(imgFilename)")
+            if CacheUtils.debug {
+                print("write-cache: \(imgFilename)")
+            }
             return imgDiskUrl
         } catch {
-            print("write-cache-failed: \(imgFilename)")
+            if CacheUtils.debug {
+                print("write-cache-failed: \(imgFilename)")
+            }
             return nil
         }
     }
